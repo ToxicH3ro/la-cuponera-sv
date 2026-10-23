@@ -1,0 +1,60 @@
+<?php
+
+declare(strict_types=1);
+
+require_once dirname(__DIR__) . '/helpers/auth.php';
+require_once dirname(__DIR__) . '/models/Usuario.php';
+
+class AuthController
+{
+    private Usuario $usuarioModel;
+
+    public function __construct(PDO $pdo)
+    {
+        $this->usuarioModel = new Usuario($pdo);
+    }
+
+    /**
+     * Verifica las credenciales e inicia la sesión.
+     */
+    public function autenticar(
+        string $identificador,
+        string $contrasena
+    ): bool {
+        $identificador = trim($identificador);
+
+        if ($identificador === '' || $contrasena === '') {
+            return false;
+        }
+
+        $usuario = $this->usuarioModel->verificarCredenciales(
+            $identificador,
+            $contrasena
+        );
+
+        if ($usuario === null) {
+            return false;
+        }
+
+        iniciarSesion();
+
+        session_regenerate_id(true);
+
+        $_SESSION['usuario'] = [
+            'id' => (int) $usuario['id'],
+            'usuario' => $usuario['usuario'],
+            'correo' => $usuario['correo'],
+            'rol' => $usuario['rol'],
+        ];
+
+        return true;
+    }
+
+    /**
+     * Cierra la sesión del usuario autenticado.
+     */
+    public function cerrarSesion(): void
+    {
+        \cerrarSesion();
+    }
+}

@@ -1,0 +1,46 @@
+<?php
+
+declare(strict_types=1);
+
+class Cliente
+{
+    public function __construct(
+        private PDO $pdo
+    ) {
+    }
+
+    /**
+     * Busca el perfil de cliente asociado a un usuario.
+     */
+    public function buscarPorUsuarioId(int $usuarioId): ?array
+    {
+        if ($usuarioId <= 0) {
+            throw new InvalidArgumentException(
+                'El ID de usuario no es válido.'
+            );
+        }
+
+        $sql = '
+            SELECT
+                id,
+                usuario_id,
+                nombre,
+                apellidos,
+                dui,
+                fecha_nacimiento
+            FROM clientes
+            WHERE usuario_id = :usuario_id
+            LIMIT 1
+        ';
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            'usuario_id' => $usuarioId,
+        ]);
+
+        $cliente = $stmt->fetch();
+
+        return $cliente !== false ? $cliente : null;
+    }
+}
+

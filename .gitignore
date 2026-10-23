@@ -1,0 +1,27 @@
+# Configuración local y secretos
+.env
+.env.*
+!.env.example
+
+/storage/logs/*
+!/storage/logs/.gitkeep
+
+# Dependencias
+/vendor/
+
+# Archivos temporales y registros
+/storage/logs/*
+!/storage/logs/.gitkeep
+
+# Archivos generados por el sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Configuración personal del editor
+.vscode/
+.idea/
+
+# Archivos temporales
+*.tmp
+*.log
