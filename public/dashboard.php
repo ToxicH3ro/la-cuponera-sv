@@ -72,6 +72,11 @@ $paneles = [
                 'url' => '#',
             ],
             [
+                'titulo' => 'Registrar administradores',
+                'descripcion' => 'Crea nuevas cuentas de administrador.',
+                'url' => 'registrar-administrador.php',
+            ],
+            [
                 'titulo' => 'Aprobar empresas',
                 'descripcion' => 'Revisa las solicitudes de registro.',
                 'url' => 'empresas-pendientes.php',
