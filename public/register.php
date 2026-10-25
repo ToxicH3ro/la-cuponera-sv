@@ -38,6 +38,40 @@ $datos = [
     'telefono' => '',
 ];
 
+/**
+ * Comprueba que la fecha sea válida y que la persona
+ * tenga estrictamente más de 18 años.
+ */
+function fechaNacimientoValidaMayorDe18(
+    string $fecha
+): bool {
+    $nacimiento = DateTimeImmutable::createFromFormat(
+        '!Y-m-d',
+        $fecha
+    );
+
+    $errores = DateTimeImmutable::getLastErrors();
+
+    if (
+        $nacimiento === false
+        || (
+            $errores !== false
+            && (
+                $errores['warning_count'] > 0
+                || $errores['error_count'] > 0
+            )
+        )
+        || $nacimiento->format('Y-m-d') !== $fecha
+    ) {
+        return false;
+    }
+
+    $hoy = new DateTimeImmutable('today');
+    $fechaLimite = $hoy->modify('-18 years');
+
+    return $nacimiento < $fechaLimite;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tipoRecibido = $_POST['tipo_cuenta'] ?? '';
     $tokenRecibido = $_POST['token_registro'] ?? '';
@@ -89,6 +123,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         )
     ) {
         $mensaje = 'Completa todos los datos del cliente.';
+    } elseif (
+        $tipoCuenta === 'cliente'
+        && !fechaNacimientoValidaMayorDe18(
+            $datos['fecha_nacimiento']
+        )
+    ) {
+        $mensaje = 'Debes tener más de 18 años e ingresar una fecha de nacimiento válida.';
     } elseif (
         $tipoCuenta === 'empresa'
         && (
