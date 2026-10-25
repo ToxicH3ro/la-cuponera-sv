@@ -74,7 +74,7 @@ $paneles = [
             [
                 'titulo' => 'Aprobar empresas',
                 'descripcion' => 'Revisa las solicitudes de registro.',
-                'url' => '#',
+                'url' => 'empresas-pendientes.php',
             ],
             [
                 'titulo' => 'Gestionar ofertas',

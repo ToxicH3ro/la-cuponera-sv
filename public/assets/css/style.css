@@ -415,3 +415,145 @@ body.auth-body {
         padding: 16px;
     }
 }
+
+/* Administración de solicitudes empresariales */
+
+.admin-page-container {
+    width: min(1200px, calc(100% - 32px));
+    margin: 32px auto;
+}
+
+.admin-panel {
+    padding: 28px;
+    margin-top: 24px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(20, 40, 70, 0.08);
+}
+
+.admin-heading h1 {
+    margin-bottom: 8px;
+}
+
+.admin-heading > p:last-child {
+    color: #667085;
+}
+
+.admin-summary {
+    margin: 24px 0 16px;
+    color: #475467;
+}
+
+.admin-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 14px;
+    border-bottom: 1px solid #e4e7ec;
+    text-align: left;
+    vertical-align: top;
+}
+
+.admin-table th {
+    background: #f8fafc;
+    color: #344054;
+    font-size: 0.9rem;
+}
+
+.admin-table td {
+    overflow-wrap: anywhere;
+    line-height: 1.6;
+}
+
+.admin-table td div {
+    margin-top: 4px;
+}
+
+.admin-action-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.admin-commission-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.85rem;
+}
+
+.admin-commission-input {
+    width: 110px;
+    max-width: 100%;
+    padding: 10px;
+    border: 1px solid #d0d5dd;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.admin-approve-button,
+.admin-reject-button {
+    padding: 10px 12px;
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.admin-approve-button {
+    background: #157347;
+    color: #ffffff;
+}
+
+.admin-reject-button {
+    background: #b42318;
+    color: #ffffff;
+}
+
+.admin-approve-button:hover,
+.admin-reject-button:hover {
+    filter: brightness(0.92);
+}
+
+.admin-back-link {
+    color: #344054;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.admin-empty {
+    padding: 30px 16px;
+    text-align: center;
+    background: #f8fafc;
+    border-radius: 12px;
+}
+
+.admin-empty p {
+    color: #667085;
+}
+
+.alert-success {
+    padding: 12px 16px;
+    margin: 16px 0;
+    color: #17653a;
+    background: #e2f5e9;
+    border-radius: 8px;
+}
+
+@media (max-width: 700px) {
+    .admin-panel {
+        padding: 16px;
+    }
+
+    .admin-table th,
+    .admin-table td {
+        padding: 10px;
+    }
+}
