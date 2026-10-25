@@ -35,7 +35,7 @@ $paneles = [
             [
                 'titulo' => 'Mis compras',
                 'descripcion' => 'Consulta tu historial de compras.',
-                'url' => 'index.php/cliente/compras',
+                'url' => 'cliente/compras',
             ],
             [
                 'titulo' => 'Mi perfil',
@@ -52,7 +52,7 @@ $paneles = [
             [
                 'titulo' => 'Mis ofertas',
                 'descripcion' => 'Consulta tus ofertas registradas.',
-                'url' => 'index.php/empresa/ofertas',
+                'url' => 'empresa/ofertas',
             ],
             [
                 'titulo' => 'Publicar ofertas',
