@@ -16,6 +16,12 @@ if (estaAutenticado()) {
 
 $mensaje = '';
 $identificador = '';
+$tipoMensaje = 'error';
+
+if (($_GET['recuperacion'] ?? '') === 'exitosa') {
+    $mensaje = 'Tu contraseña se actualizó correctamente. Ya puedes iniciar sesión.';
+    $tipoMensaje = 'success';
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $identificadorRecibido = $_POST['identificador'] ?? '';
@@ -105,7 +111,11 @@ function escapar(string $valor): string
             </header>
 
             <?php if ($mensaje !== ''): ?>
-                <div class="alert alert-error" role="alert">
+                <div
+                    class="alert <?= $tipoMensaje === 'success'
+                        ? 'alert-success'
+                        : 'alert-error' ?>"
+                    role="alert">
                     <?= escapar($mensaje) ?>
                 </div>
             <?php endif; ?>
@@ -153,6 +163,11 @@ function escapar(string $valor): string
                 <p>
                     ¿Todavía no tienes una cuenta?
                     <a href="register.php">Regístrate aquí</a>
+                </p>
+                <p>
+                    <a href="recuperar-contrasena.php">
+                        ¿Olvidaste tu contraseña?
+                    </a>
                 </p>
             </div>
 
