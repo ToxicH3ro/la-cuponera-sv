@@ -1,0 +1,8 @@
+Options -MultiViews
+RewriteEngine On
+
+# Si el recurso solicitado no existe físicamente,
+# enviar la solicitud al enrutador de la aplicación.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]

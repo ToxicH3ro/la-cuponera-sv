@@ -5,7 +5,11 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/app/helpers/auth.php';
 
 iniciarSesion();
-requerirAutenticacion();
+
+if (!estaAutenticado()) {
+    header('Location: login.php');
+    exit;
+}
 
 $usuario = obtenerUsuarioAutenticado();
 

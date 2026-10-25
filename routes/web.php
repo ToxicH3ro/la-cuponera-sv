@@ -17,6 +17,11 @@ return [
 
     'GET' => [
 
+        '/' => [
+            'controller' => 'OfertaController',
+            'method' => 'listarCatalogo',
+        ],
+
         '/ofertas' => [
             'controller' => 'OfertaController',
             'method' => 'listarCatalogo',

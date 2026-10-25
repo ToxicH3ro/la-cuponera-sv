@@ -8,15 +8,9 @@ require_once dirname(__DIR__) . '/app/controllers/AuthController.php';
 
 iniciarSesion();
 
-if (!estaAutenticado()) {
-    header('Location: login.php');
-    exit;
-}
-
-$usuario = obtenerUsuarioAutenticado();
-
-if ($usuario === null) {
-    header('Location: login.php');
+// Si ya inició sesión, no necesita volver al login.
+if (estaAutenticado()) {
+    header('Location: dashboard.php');
     exit;
 }
 
