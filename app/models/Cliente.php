@@ -93,7 +93,7 @@ class Cliente
 
         if ($fecha > $fechaLimite) {
             throw new DomainException(
-                'El cliente debe tener al menos 18 años.'
+                'El cliente debe tener más de 18 años.'
             );
         }
 

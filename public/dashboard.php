@@ -5,7 +5,11 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/app/helpers/auth.php';
 
 iniciarSesion();
-requerirAutenticacion();
+
+if (!estaAutenticado()) {
+    header('Location: login.php');
+    exit;
+}
 
 $usuario = obtenerUsuarioAutenticado();
 
@@ -31,7 +35,7 @@ $paneles = [
             [
                 'titulo' => 'Mis compras',
                 'descripcion' => 'Consulta tu historial de compras.',
-                'url' => 'index.php/cliente/compras',
+                'url' => 'cliente/compras',
             ],
             [
                 'titulo' => 'Mi perfil',
@@ -48,7 +52,7 @@ $paneles = [
             [
                 'titulo' => 'Mis ofertas',
                 'descripcion' => 'Consulta tus ofertas registradas.',
-                'url' => 'index.php/empresa/ofertas',
+                'url' => 'empresa/ofertas',
             ],
             [
                 'titulo' => 'Publicar ofertas',
@@ -68,9 +72,14 @@ $paneles = [
                 'url' => '#',
             ],
             [
+                'titulo' => 'Registrar administradores',
+                'descripcion' => 'Crea nuevas cuentas de administrador.',
+                'url' => 'registrar-administrador.php',
+            ],
+            [
                 'titulo' => 'Aprobar empresas',
                 'descripcion' => 'Revisa las solicitudes de registro.',
-                'url' => '#',
+                'url' => 'empresas-pendientes.php',
             ],
             [
                 'titulo' => 'Gestionar ofertas',

@@ -40,7 +40,8 @@ class RecuperacionService
         $usuario = $this->usuarioModel
             ->buscarPorUsuarioOCorreo($correo);
 
-        if ($usuario === null) {
+        if ($usuario === null 
+        || ($usuario['estado'] ?? '') !== 'activo') {
             return null;
         }
 
@@ -76,7 +77,7 @@ class RecuperacionService
                 ) VALUES (
                     :usuario_id,
                     :token_hash,
-                    :vence_en,
+                    DATE_ADD(NOW(), INTERVAL 30 MINUTE),
                     NULL
                 )
             ';
@@ -85,10 +86,6 @@ class RecuperacionService
             $stmtInsertar->execute([
                 'usuario_id' => (int) $usuario['id'],
                 'token_hash' => $tokenHash,
-                'vence_en' => date(
-                    'Y-m-d H:i:s',
-                    time() + self::DURACION_TOKEN
-                ),
             ]);
 
             if ($iniciarTransaccion) {
@@ -126,16 +123,18 @@ class RecuperacionService
         $tokenHash = hash('sha256', $token);
 
         $sql = '
-            SELECT usuario_id
-            FROM tokens_recuperacion
-            WHERE token_hash = :token_hash
-              AND usado_en IS NULL
-              AND vence_en > NOW()
+            SELECT tr.usuario_id
+            FROM tokens_recuperacion tr
+            INNER JOIN usuarios u ON tr.usuario_id = u.id
+            WHERE tr.token_hash = :token_hash
+              AND tr.usado_en IS NULL
+              AND tr.vence_en > NOW()
+              AND u.estado = :estado
             LIMIT 1
         ';
 
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['token_hash' => $tokenHash]);
+        $stmt->execute(['token_hash' => $tokenHash, 'estado' => 'activo']);
 
         $resultado = $stmt->fetch();
 
@@ -193,17 +192,19 @@ class RecuperacionService
         try {
             // Bloquea el registro para impedir el uso simultáneo.
             $sqlToken = '
-                SELECT id, usuario_id
-                FROM tokens_recuperacion
-                WHERE token_hash = :token_hash
-                  AND usado_en IS NULL
-                  AND vence_en > NOW()
+                SELECT tr.id, tr.usuario_id
+                FROM tokens_recuperacion tr
+                INNER JOIN usuarios u ON tr.usuario_id = u.id
+                WHERE tr.token_hash = :token_hash
+                  AND tr.usado_en IS NULL
+                  AND tr.vence_en > NOW()
+                  AND u.estado = :estado
                 LIMIT 1
                 FOR UPDATE
             ';
 
             $stmtToken = $this->pdo->prepare($sqlToken);
-            $stmtToken->execute(['token_hash' => $tokenHash]);
+            $stmtToken->execute(['token_hash' => $tokenHash, 'estado' => 'activo']);
 
             $registroToken = $stmtToken->fetch();
 
@@ -217,12 +218,14 @@ class RecuperacionService
                 UPDATE usuarios
                 SET password_hash = :password_hash
                 WHERE id = :usuario_id
+                AND estado = :estado
             ';
 
             $stmtUsuario = $this->pdo->prepare($sqlUsuario);
             $stmtUsuario->execute([
                 'password_hash' => $passwordHash,
                 'usuario_id' => (int) $registroToken['usuario_id'],
+                'estado' => 'activo',
             ]);
 
             if ($stmtUsuario->rowCount() !== 1) {
