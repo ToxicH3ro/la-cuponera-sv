@@ -8,17 +8,17 @@ require_once dirname(__DIR__) . '/app/controllers/AuthController.php';
 
 iniciarSesion();
 
-if (!estaAutenticado()) {
+/*if (!estaAutenticado()) {
     header('Location: login.php');
     exit;
-}
+}*/
 
 $usuario = obtenerUsuarioAutenticado();
 
-if ($usuario === null) {
+/*if ($usuario === null) {
     header('Location: login.php');
     exit;
-}
+}*/
 
 $mensaje = '';
 $identificador = '';
