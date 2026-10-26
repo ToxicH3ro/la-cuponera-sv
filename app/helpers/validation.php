@@ -94,7 +94,7 @@ function validarMayorDeEdad(string $fechaNacimiento): bool
     $nacimiento = new DateTimeImmutable($fechaNacimiento);
     $hoy = new DateTimeImmutable('today');
 
-    return $nacimiento <= $hoy->modify('-18 years');
+    return $nacimiento < $hoy->modify('-18 years');
 }
 
 /**

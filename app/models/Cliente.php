@@ -65,6 +65,16 @@ class Cliente
             );
         }
 
+        if (
+            preg_match('/\A.{1,100}\z/us', trim($nombre)) !== 1
+            || preg_match('/\A.{1,100}\z/us', trim($apellidos)) !== 1
+        ) {
+            throw new InvalidArgumentException(
+                'El nombre y los apellidos deben tener '
+                . 'entre 1 y 100 caracteres.'
+            );
+        }
+
         $fecha = DateTimeImmutable::createFromFormat(
             '!Y-m-d',
             $fechaNacimiento
@@ -91,7 +101,7 @@ class Cliente
         $mayoriaEdad = new DateTimeImmutable('today');
         $fechaLimite = $mayoriaEdad->modify('-18 years');
 
-        if ($fecha > $fechaLimite) {
+        if ($fecha >= $fechaLimite) {
             throw new DomainException(
                 'El cliente debe tener más de 18 años.'
             );

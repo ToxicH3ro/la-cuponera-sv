@@ -134,7 +134,7 @@ function escapar(string $valor): string
                         placeholder="Tu usuario o correo"
                         value="<?= escapar($identificador) ?>"
                         autocomplete="username"
-                        maxlength="100"
+                        maxlength="150"
                         required
                         autofocus
                     >
