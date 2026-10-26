@@ -63,8 +63,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         || $confirmacionRecibida === ''
     ) {
         $mensaje = 'Completa ambos campos de contraseña.';
-    } elseif (strlen($contrasenaRecibida) < 12) {
-        $mensaje = 'La contraseña debe tener al menos 12 caracteres.';
+    } elseif (strlen($contrasenaRecibida) < 12 || strlen($contrasenaRecibida) > 72) {
+        $mensaje = 'La contraseña debe tener al menos 12 y 72 caracteres.';
     } elseif ($contrasenaRecibida !== $confirmacionRecibida) {
         $mensaje = 'Las contraseñas no coinciden.';
     } else {

@@ -122,6 +122,66 @@ class Empresa
             );
         }
 
+        $nombre = trim($nombre);
+        $nit = trim($nit);
+        $direccion = trim($direccion);
+        $telefono = trim($telefono);
+
+        if (
+            preg_match('/\A.{1,150}\z/us', $nombre) !== 1
+        ) {
+            throw new InvalidArgumentException(
+                'El nombre de la empresa no puede superar 150 caracteres.'
+            );
+        }
+
+        if (
+            preg_match('/\A.{1,255}\z/us', $direccion) !== 1
+        ) {
+            throw new InvalidArgumentException(
+                'La dirección no puede superar 255 caracteres.'
+            );
+        }
+
+        $nitSinSeparadores = preg_replace('/[\s-]+/', '', $nit);
+
+        if (
+            !is_string($nitSinSeparadores)
+            || preg_match('/\A\d{14}\z/', $nitSinSeparadores) !== 1
+        ) {
+            throw new InvalidArgumentException(
+                'El NIT empresarial debe contener 14 dígitos.'
+            );
+        }
+
+        $telefonoNormalizado = preg_replace(
+            '/[\s()-]+/',
+            '',
+            $telefono
+        );
+
+        if (!is_string($telefonoNormalizado)) {
+            throw new InvalidArgumentException(
+                'El teléfono no es válido.'
+            );
+        }
+
+        if (
+            preg_match(
+                '/\A(?:\+?503)?([267]\d{7})\z/',
+                $telefonoNormalizado,
+                $coincidenciasTelefono
+            ) !== 1
+        ) {
+            throw new InvalidArgumentException(
+                'Introduce un teléfono salvadoreño válido de 8 dígitos, '
+                . 'con prefijo +503 opcional.'
+            );
+        }
+
+        $nit = $nitSinSeparadores;
+        $telefono = $coincidenciasTelefono[1];
+
         $sqlUsuario = '
             SELECT id
             FROM usuarios

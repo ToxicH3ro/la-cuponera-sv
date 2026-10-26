@@ -82,14 +82,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             || $confirmacion === ''
         ) {
             $mensaje = 'Completa todos los campos.';
-        } elseif (strlen($usuario) > 100) {
+        } elseif (strlen($usuario) > 50) {
             $mensaje = 'El nombre de usuario es demasiado largo.';
         } elseif (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
             $mensaje = 'Introduce un correo electrónico válido.';
-        } elseif (strlen($correo) > 254) {
+        } elseif (strlen($correo) > 150) {
             $mensaje = 'El correo electrónico es demasiado largo.';
-        } elseif (strlen($contrasena) < 12) {
-            $mensaje = 'La contraseña debe tener al menos 12 caracteres.';
+        } elseif (strlen($contrasena) < 12 || strlen($contrasena) > 72) {
+            $mensaje = 'La contraseña debe tener al menos 12 y 72 caracteres.';
         } elseif ($contrasena !== $confirmacion) {
             $mensaje = 'Las contraseñas no coinciden.';
         } else {

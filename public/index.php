@@ -2,6 +2,45 @@
 
 declare(strict_types=1);
 
+$metodoEntrada = strtoupper(
+    $_SERVER['REQUEST_METHOD'] ?? 'GET'
+);
+
+$rutaEntrada = parse_url(
+    $_SERVER['REQUEST_URI'] ?? '/',
+    PHP_URL_PATH
+);
+
+$scriptEntrada = str_replace(
+    '\\',
+    '/',
+    $_SERVER['SCRIPT_NAME'] ?? '/index.php'
+);
+
+$directorioEntrada = rtrim(
+    str_replace('\\', '/', dirname($scriptEntrada)),
+    '/'
+);
+
+$rutasDeInicio = [
+    $directorioEntrada,
+    $directorioEntrada . '/',
+    $scriptEntrada,
+];
+
+if (
+    $metodoEntrada === 'GET'
+    && is_string($rutaEntrada)
+    && in_array($rutaEntrada, $rutasDeInicio, true)
+) {
+    header(
+        'Location: ' . $directorioEntrada . '/ofertas.php',
+        true,
+        302
+    );
+    exit;
+}
+
 require_once dirname(__DIR__) . '/app/config/database.php';
 require_once dirname(__DIR__) . '/app/helpers/auth.php';
 

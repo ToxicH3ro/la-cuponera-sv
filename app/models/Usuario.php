@@ -91,15 +91,37 @@ class Usuario
             );
         }
 
-        if (trim($usuario) === '' || trim($correo) === '') {
+        $usuario = trim($usuario);
+        $correo = trim($correo);
+
+        if (
+            preg_match(
+                '/\A[A-Za-z0-9_.-]{3,50}\z/',
+                $usuario
+            ) !== 1
+        ) {
             throw new InvalidArgumentException(
-                'El usuario y el correo son obligatorios.'
+                'El usuario debe tener entre 3 y 50 caracteres. '
+                . 'Utiliza letras sin tildes, números, punto, '
+                . 'guion o guion bajo.'
             );
         }
 
-        if (strlen($contrasena) < 12) {
+        if (
+            strlen($correo) > 150
+            || filter_var($correo, FILTER_VALIDATE_EMAIL) === false
+        ) {
             throw new InvalidArgumentException(
-                'La contraseña debe tener al menos 12 caracteres.'
+                'Introduce un correo válido de hasta 150 caracteres.'
+            );
+        }
+
+        if (
+            strlen($contrasena) < 12
+            || strlen($contrasena) > 72
+        ) {
+            throw new InvalidArgumentException(
+                'La contraseña debe tener entre 12 y 72 bytes.'
             );
         }
 
@@ -177,9 +199,12 @@ class Usuario
         int $id,
         string $nuevaContrasena
     ): bool {
-        if (strlen($nuevaContrasena) < 12) {
+        if (
+            strlen($nuevaContrasena) < 12
+            || strlen($nuevaContrasena) > 72
+        ) {
             throw new InvalidArgumentException(
-                'La contraseña debe tener al menos 12 caracteres.'
+                'La contraseña debe tener entre 12 y 72 bytes.'
             );
         }
 
@@ -202,5 +227,36 @@ class Usuario
         ]);
 
         return $stmt->rowCount() > 0;
+    }
+
+    public function buscarPorCorreo(string $correo): ?array
+    {
+        $correo = trim($correo);
+
+        if (
+            strlen($correo) > 150
+            || filter_var($correo, FILTER_VALIDATE_EMAIL) === false
+        ) {
+            return null;
+        }
+
+        $sql = '
+            SELECT
+                id,
+                usuario,
+                correo,
+                rol,
+                estado
+            FROM usuarios
+            WHERE correo = :correo
+            LIMIT 1
+        ';
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['correo' => $correo]);
+
+        $usuario = $stmt->fetch();
+
+        return $usuario !== false ? $usuario : null;
     }
 }

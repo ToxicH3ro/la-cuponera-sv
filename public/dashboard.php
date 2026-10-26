@@ -18,6 +18,33 @@ if ($usuario === null) {
     exit;
 }
 
+$perfilEmpresa = null;
+$errorPerfilEmpresa = false;
+
+if (($usuario['rol'] ?? '') === 'empresa') {
+    try {
+        require_once dirname(__DIR__) . '/app/config/database.php';
+        require_once dirname(__DIR__) . '/app/models/Empresa.php';
+
+        $modeloEmpresa = new Empresa($pdo);
+
+        $perfilEmpresa = $modeloEmpresa->buscarPorUsuarioId(
+            (int) $usuario['id']
+        );
+
+        if ($perfilEmpresa === null) {
+            $errorPerfilEmpresa = true;
+        }
+    } catch (Throwable $e) {
+        error_log(
+            '[La Cuponera SV] Error al cargar estado empresarial: '
+            . $e->getMessage()
+        );
+
+        $errorPerfilEmpresa = true;
+    }
+}
+
 $rol = $usuario['rol'] ?? '';
 $nombreUsuario = $usuario['usuario'] ?? 'Usuario';
 $correoUsuario = $usuario['correo'] ?? '';
@@ -162,6 +189,94 @@ function escaparDashboard(string $valor): string
                     </span>
                 </div>
             </section>
+
+            <?php if ($rol === 'empresa'): ?>
+                <section
+                    class="dashboard-profile"
+                    aria-labelledby="titulo-estado-empresa"
+                >
+                    <div>
+                        <h2 id="titulo-estado-empresa">
+                            Estado de tu empresa
+                        </h2>
+
+                        <?php if ($errorPerfilEmpresa): ?>
+
+                            <p role="alert">
+                                No pudimos consultar el estado de tu solicitud.
+                                Inténtalo nuevamente.
+                            </p>
+
+                        <?php elseif ($perfilEmpresa !== null): ?>
+
+                            <p>
+                                <strong>
+                                    <?= escaparDashboard(
+                                        (string) $perfilEmpresa['nombre']
+                                    ) ?>
+                                </strong>
+                            </p>
+
+                            <?php
+                            $estadoEmpresa = (string)
+                                $perfilEmpresa['estado_aprobacion'];
+
+                            $mensajesEmpresa = [
+                                'pendiente' => [
+                                    'titulo' => 'Pendiente de aprobación',
+                                    'descripcion' =>
+                                        'Tu solicitud está siendo revisada. '
+                                        . 'Podrás publicar ofertas cuando sea aprobada.',
+                                ],
+                                'aprobada' => [
+                                    'titulo' => 'Empresa aprobada',
+                                    'descripcion' =>
+                                        'Tu empresa está autorizada para publicar ofertas.',
+                                ],
+                                'rechazada' => [
+                                    'titulo' => 'Solicitud rechazada',
+                                    'descripcion' =>
+                                        'Tu solicitud no fue aprobada. '
+                                        . 'No puedes publicar ofertas.',
+                                ],
+                            ];
+
+                            $informacionEstado = $mensajesEmpresa[$estadoEmpresa]
+                                ?? [
+                                    'titulo' => 'Estado no disponible',
+                                    'descripcion' =>
+                                        'No fue posible identificar el estado de la solicitud.',
+                                ];
+                            ?>
+
+                            <span class="dashboard-role">
+                                <?= escaparDashboard(
+                                    $informacionEstado['titulo']
+                                ) ?>
+                            </span>
+
+                            <p>
+                                <?= escaparDashboard(
+                                    $informacionEstado['descripcion']
+                                ) ?>
+                            </p>
+
+                            <?php if ($estadoEmpresa === 'aprobada'): ?>
+                                <p>
+                                    Comisión asignada:
+                                    <strong>
+                                        <?= number_format(
+                                            (float) $perfilEmpresa['comision_porcentaje'],
+                                            2
+                                        ) ?>%
+                                    </strong>
+                                </p>
+                            <?php endif; ?>
+
+                        <?php endif; ?>
+                    </div>
+                </section>
+            <?php endif; ?>
 
             <section class="dashboard-section">
                 <h2>Accesos rápidos</h2>

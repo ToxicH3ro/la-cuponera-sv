@@ -109,8 +109,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mensaje = 'Completa los campos obligatorios.';
     } elseif (!filter_var($datos['correo'], FILTER_VALIDATE_EMAIL)) {
         $mensaje = 'Introduce un correo electrónico válido.';
-    } elseif (strlen($contrasena) < 12) {
-        $mensaje = 'La contraseña debe tener al menos 12 caracteres.';
+    } elseif (strlen($contrasena) < 12 || strlen($contrasena) > 72) {
+        $mensaje = 'La contraseña debe tener al menos 12 y 72 caracteres.';
     } elseif ($contrasena !== $confirmacion) {
         $mensaje = 'Las contraseñas no coinciden.';
     } elseif (
@@ -303,6 +303,9 @@ function escaparRegistro(string $valor): string
                         type="text"
                         id="usuario"
                         name="usuario"
+                        minlength="3"
+                        maxlength="50"
+                        pattern="[A-Za-z0-9_.-]{3,50}"
                         value="<?= escaparRegistro($datos['usuario']) ?>"
                         autocomplete="username"
                         required
@@ -316,6 +319,7 @@ function escaparRegistro(string $valor): string
                         type="email"
                         id="correo"
                         name="correo"
+                        maxlength="150"
                         value="<?= escaparRegistro($datos['correo']) ?>"
                         autocomplete="email"
                         required

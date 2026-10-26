@@ -37,8 +37,7 @@ class RecuperacionService
             );
         }
 
-        $usuario = $this->usuarioModel
-            ->buscarPorUsuarioOCorreo($correo);
+        $usuario = $this->usuarioModel->buscarPorCorreo($correo);
 
         if ($usuario === null 
         || ($usuario['estado'] ?? '') !== 'activo') {
@@ -164,9 +163,12 @@ class RecuperacionService
             );
         }
 
-        if (strlen($nuevaContrasena) < 12) {
+        if (
+            strlen($nuevaContrasena) < 12
+            || strlen($nuevaContrasena) > 72
+        ) {
             throw new InvalidArgumentException(
-                'La contraseña debe tener al menos 12 caracteres.'
+                'La contraseña debe tener entre 12 y 72 bytes.'
             );
         }
 
