@@ -166,11 +166,7 @@ try {
         );
     }
 
-    if ($nombreControlador === 'AdminController') {
-        $controlador = new AdminController();
-    } else {
-        $controlador = new $nombreControlador($pdo);
-    }
+    $controlador = new $nombreControlador($pdo);
 
     if (!method_exists($controlador, $nombreMetodo)) {
         throw new RuntimeException(

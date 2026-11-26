@@ -109,6 +109,11 @@ $paneles = [
                 'url' => 'empresas-pendientes.php',
             ],
             [
+                'titulo' => 'Listado de empresas',
+                'descripcion' => 'Consulta todas las empresas registradas y sus estados.',
+                'url' => 'empresas.php',
+            ],
+            [
                 'titulo' => 'Gestionar ofertas',
                 'descripcion' => 'Supervisa las promociones de la plataforma.',
                 'url' => '#',

@@ -557,3 +557,178 @@ body.auth-body {
         padding: 10px;
     }
 }
+
+/* Listado general de empresas */
+
+.company-list-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.company-list-content {
+    width: min(1250px, 94%);
+    margin: 0 auto;
+    padding: 38px 0;
+    flex: 1;
+}
+
+.company-list-heading {
+    margin-bottom: 28px;
+}
+
+.company-list-heading h1 {
+    margin: 8px 0;
+    color: var(--primary);
+    font-size: clamp(25px, 4vw, 34px);
+}
+
+.company-list-heading > p:last-child {
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.company-list-summary {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.company-summary-card {
+    min-width: 190px;
+    padding: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 5px 18px rgba(17, 34, 80, 0.05);
+}
+
+.company-summary-card span {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.company-summary-card strong {
+    color: var(--primary);
+    font-size: 28px;
+}
+
+.company-filter {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    margin-bottom: 22px;
+    padding: 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.company-filter .form-group {
+    width: min(300px, 100%);
+    margin-bottom: 0;
+}
+
+.company-filter-button {
+    min-height: 48px;
+    padding: 12px 22px;
+    border: none;
+    border-radius: 9px;
+    background: var(--primary);
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.company-filter-button:hover {
+    background: var(--primary-hover);
+}
+
+.company-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.company-table {
+    width: 100%;
+    min-width: 850px;
+    border-collapse: collapse;
+}
+
+.company-table th,
+.company-table td {
+    padding: 15px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: middle;
+}
+
+.company-table th {
+    background: #f8fafc;
+    color: var(--primary);
+    font-size: 13px;
+}
+
+.company-table td {
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+.company-table td small {
+    display: block;
+    margin-top: 4px;
+    color: var(--muted);
+}
+
+.company-status {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.company-status-pending {
+    background: #fff4d6;
+    color: #925f00;
+}
+
+.company-status-approved {
+    background: #e2f5e9;
+    color: #17653a;
+}
+
+.company-status-rejected {
+    background: #fff0f0;
+    color: #a62929;
+}
+
+.company-no-commission {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+@media (max-width: 600px) {
+    .company-list-content {
+        width: 92%;
+        padding: 25px 0;
+    }
+
+    .company-filter {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .company-filter .form-group {
+        width: 100%;
+    }
+
+    .company-filter-button {
+        width: 100%;
+    }
+}

@@ -99,6 +99,72 @@ class Empresa
     }
 
     /**
+     * Lista todas las empresas registradas.
+     * Permite filtrar por estado de aprobación.
+     */
+    public function listarTodas(?string $estado = null): array
+    {
+        $estadosPermitidos = [
+            'pendiente',
+            'aprobada',
+            'rechazada',
+        ];
+
+        if (
+            $estado !== null
+            && !in_array($estado, $estadosPermitidos, true)
+        ) {
+            throw new InvalidArgumentException(
+                'El estado de empresa indicado no es válido.'
+            );
+        }
+
+        $sql = '
+            SELECT
+                e.id,
+                e.usuario_id,
+                e.nombre,
+                e.nit,
+                e.direccion,
+                e.telefono,
+                e.estado_aprobacion,
+                e.comision_porcentaje,
+                e.creado_en,
+                u.usuario,
+                u.correo,
+                u.estado AS estado_usuario
+            FROM empresas e
+            INNER JOIN usuarios u
+                ON u.id = e.usuario_id
+        ';
+
+        $parametros = [];
+
+        if ($estado !== null) {
+            $sql .= '
+                WHERE e.estado_aprobacion = :estado
+            ';
+
+            $parametros['estado'] = $estado;
+        }
+
+        $sql .= '
+            ORDER BY
+                CASE e.estado_aprobacion
+                    WHEN "pendiente" THEN 1
+                    WHEN "aprobada" THEN 2
+                    WHEN "rechazada" THEN 3
+                END,
+                e.creado_en DESC
+        ';
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($parametros);
+
+        return $stmt->fetchAll();
+    }
+
+    /**
      * Crea el perfil de una empresa con aprobación pendiente.
      *
      * El usuario debe existir previamente y tener el rol empresa.
