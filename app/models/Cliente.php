@@ -163,5 +163,104 @@ class Cliente
         return (int) $this->pdo->lastInsertId();
     }
 
+    /**
+     * Actualiza los datos personales del perfil de un cliente.
+     */
+    public function actualizarPerfil(
+        int $usuarioId,
+        string $nombre,
+        string $apellidos,
+        string $dui,
+        string $fechaNacimiento
+    ): bool {
+        $nombre = trim($nombre);
+        $apellidos = trim($apellidos);
+        $dui = trim($dui);
+        $fechaNacimiento = trim($fechaNacimiento);
+
+        if (
+            $usuarioId <= 0
+            || $nombre === ''
+            || $apellidos === ''
+            || !preg_match('/^\d{8}-\d$/', $dui)
+        ) {
+            throw new InvalidArgumentException(
+                'Los datos del cliente no son válidos.'
+            );
+        }
+
+        if (
+            preg_match('/\A.{1,100}\z/us', $nombre) !== 1
+            || preg_match('/\A.{1,100}\z/us', $apellidos) !== 1
+        ) {
+            throw new InvalidArgumentException(
+                'El nombre y los apellidos deben tener entre 1 y 100 caracteres.'
+            );
+        }
+
+        $fecha = DateTimeImmutable::createFromFormat(
+            '!Y-m-d',
+            $fechaNacimiento
+        );
+
+        $erroresFecha = DateTimeImmutable::getLastErrors();
+
+        if (
+            $fecha === false
+            || (
+                $erroresFecha !== false
+                && (
+                    $erroresFecha['warning_count'] > 0
+                    || $erroresFecha['error_count'] > 0
+                )
+            )
+            || $fecha->format('Y-m-d') !== $fechaNacimiento
+        ) {
+            throw new InvalidArgumentException(
+                'La fecha de nacimiento no es válida.'
+            );
+        }
+
+        $fechaLimite = (new DateTimeImmutable('today'))
+            ->modify('-18 years');
+
+        if ($fecha >= $fechaLimite) {
+            throw new DomainException(
+                'El cliente debe tener más de 18 años.'
+            );
+        }
+
+        // Verifica que el cliente tenga un perfil registrado.
+        $perfil = $this->buscarPorUsuarioId($usuarioId);
+
+        if ($perfil === null) {
+            throw new DomainException(
+                'No se encontró el perfil del cliente.'
+            );
+        }
+
+        $sql = '
+            UPDATE clientes
+            SET
+                nombre = :nombre,
+                apellidos = :apellidos,
+                dui = :dui,
+                fecha_nacimiento = :fecha_nacimiento
+            WHERE usuario_id = :usuario_id
+        ';
+
+        $stmt = $this->pdo->prepare($sql);
+
+        $stmt->execute([
+            'nombre' => $nombre,
+            'apellidos' => $apellidos,
+            'dui' => $dui,
+            'fecha_nacimiento' => $fechaNacimiento,
+            'usuario_id' => $usuarioId,
+        ]);
+
+        return true;
+    }
+
 }
 

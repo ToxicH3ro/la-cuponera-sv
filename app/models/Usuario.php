@@ -259,4 +259,102 @@ class Usuario
 
         return $usuario !== false ? $usuario : null;
     }
+
+    /**
+     * Obtiene las cuentas registradas en la plataforma.
+     *
+     * Permite filtrar por rol, estado y buscar por usuario o correo.
+     * No consulta ni devuelve contraseñas o hashes.
+     */
+    public function listarTodos(
+        ?string $rol = null,
+        ?string $estado = null,
+        string $busqueda = ''
+    ): array {
+        $rolesPermitidos = [
+            'cliente',
+            'empresa',
+            'admin',
+        ];
+
+        $estadosPermitidos = [
+            'activo',
+            'inactivo',
+            'bloqueado',
+        ];
+
+        if (
+            $rol !== null
+            && !in_array($rol, $rolesPermitidos, true)
+        ) {
+            throw new InvalidArgumentException(
+                'El rol seleccionado no es válido.'
+            );
+        }
+
+        if (
+            $estado !== null
+            && !in_array($estado, $estadosPermitidos, true)
+        ) {
+            throw new InvalidArgumentException(
+                'El estado seleccionado no es válido.'
+            );
+        }
+
+        $busqueda = trim($busqueda);
+
+        if (strlen($busqueda) > 150) {
+            throw new InvalidArgumentException(
+                'La búsqueda no puede superar los 150 caracteres.'
+            );
+        }
+
+        $sql = '
+            SELECT
+                id,
+                usuario,
+                correo,
+                rol,
+                estado,
+                creado_en,
+                actualizado_en
+            FROM usuarios
+            WHERE 1 = 1
+        ';
+
+        $parametros = [];
+
+        if ($rol !== null) {
+            $sql .= ' AND rol = :rol';
+            $parametros['rol'] = $rol;
+        }
+
+        if ($estado !== null) {
+            $sql .= ' AND estado = :estado';
+            $parametros['estado'] = $estado;
+        }
+
+        if ($busqueda !== '') {
+            $sql .= '
+                AND (
+                    usuario LIKE :busqueda_usuario
+                    OR correo LIKE :busqueda_correo
+                )
+            ';
+
+            $termino = '%' . $busqueda . '%';
+
+            $parametros['busqueda_usuario'] = $termino;
+            $parametros['busqueda_correo'] = $termino;
+        }
+
+        $sql .= '
+            ORDER BY creado_en DESC, id DESC
+        ';
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($parametros);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

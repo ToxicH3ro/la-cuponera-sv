@@ -66,8 +66,8 @@ $paneles = [
             ],
             [
                 'titulo' => 'Mi perfil',
-                'descripcion' => 'Consulta y administra tus datos.',
-                'url' => '#',
+                'descripcion' => 'Consulta y actualiza tus datos personales.',
+                'url' => 'perfil-cliente.php',
             ],
         ],
     ],
@@ -95,8 +95,8 @@ $paneles = [
         'opciones' => [
             [
                 'titulo' => 'Gestionar usuarios',
-                'descripcion' => 'Administra las cuentas registradas.',
-                'url' => '#',
+                'descripcion' => 'Consulta los clientes, empresas y administradores registrados.',
+                'url' => 'usuarios.php',
             ],
             [
                 'titulo' => 'Registrar administradores',
