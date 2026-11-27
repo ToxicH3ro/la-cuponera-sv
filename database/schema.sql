@@ -1,4 +1,3 @@
-
 -- =====================================================
 -- LA CUPONERA SV
 -- Esquema inicial de la base de datos

@@ -5,11 +5,15 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/helpers/auth.php';
 require_once dirname(__DIR__) . '/models/Empresa.php';
 require_once dirname(__DIR__) . '/models/Usuario.php';
+require_once dirname(__DIR__) . '/models/Cliente.php';
+require_once dirname(__DIR__) . '/models/Reporte.php';
 
 class AdminController
 {
     private Empresa $empresaModel;
     private Usuario $usuarioModel;
+    private Cliente $clienteModel;
+    private Reporte $reporteModel;
 
     public function __construct(PDO $pdo)
     {
@@ -18,11 +22,12 @@ class AdminController
 
         $this->empresaModel = new Empresa($pdo);
         $this->usuarioModel = new Usuario($pdo);
+        $this->clienteModel = new Cliente($pdo);
+        $this->reporteModel = new Reporte($pdo);
     }
 
     /**
      * Obtiene el listado general de empresas.
-     *
      * Se puede filtrar por pendiente, aprobada o rechazada.
      */
     public function listarEmpresas(?string $estado = null): array
@@ -32,7 +37,6 @@ class AdminController
 
     /**
      * Obtiene el listado de usuarios registrados.
-     *
      * Permite filtrar por rol, estado y texto de búsqueda.
      */
     public function listarUsuarios(
@@ -43,6 +47,58 @@ class AdminController
         return $this->usuarioModel->listarTodos(
             $rol,
             $estado,
+            $busqueda
+        );
+    }
+
+    /**
+     * Obtiene los perfiles de clientes registrados.
+     */
+    public function listarPerfilesClientes(
+        string $busqueda = ''
+    ): array {
+        return $this->clienteModel->listarPerfilesAdministracion(
+            $busqueda
+        );
+    }
+
+    /**
+     * Obtiene el perfil completo de un cliente específico.
+     */
+    public function obtenerPerfilCliente(
+        int $clienteId
+    ): ?array {
+        return $this->clienteModel
+            ->buscarPerfilCompletoParaAdministracion($clienteId);
+    }
+
+    /**
+     * Obtiene el reporte de actividad y ventas por empresa.
+     */
+    public function obtenerReporteEmpresas(
+        ?string $fechaInicio = null,
+        ?string $fechaFin = null,
+        string $busqueda = ''
+    ): array {
+        return $this->reporteModel->obtenerReporteEmpresas(
+            $fechaInicio,
+            $fechaFin,
+            $busqueda
+        );
+    }
+
+    /**
+     * Obtiene el reporte de cuentas administrativas.
+     * Permite filtrar por fechas de registro y búsqueda.
+     */
+    public function obtenerReporteAdministradores(
+        ?string $fechaInicio = null,
+        ?string $fechaFin = null,
+        string $busqueda = ''
+    ): array {
+        return $this->reporteModel->obtenerReporteAdministradores(
+            $fechaInicio,
+            $fechaFin,
             $busqueda
         );
     }

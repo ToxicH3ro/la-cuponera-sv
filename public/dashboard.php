@@ -99,6 +99,16 @@ $paneles = [
                 'url' => 'usuarios.php',
             ],
             [
+                'titulo' => 'Listado de administradores',
+                'descripcion' => 'Consulta los administradores registrados en la plataforma.',
+                'url' => 'administradores.php',
+            ],
+            [
+                'titulo' => 'Perfiles de clientes',
+                'descripcion' => 'Consulta los perfiles y datos de los clientes registrados.',
+                'url' => 'clientes.php',
+            ],
+            [
                 'titulo' => 'Registrar administradores',
                 'descripcion' => 'Crea nuevas cuentas de administrador.',
                 'url' => 'registrar-administrador.php',
@@ -112,6 +122,16 @@ $paneles = [
                 'titulo' => 'Listado de empresas',
                 'descripcion' => 'Consulta todas las empresas registradas y sus estados.',
                 'url' => 'empresas.php',
+            ],
+            [
+                'titulo' => 'Reportes de empresas',
+                'descripcion' => 'Consulta los reportes e indicadores de actividad de las empresas.',
+                'url' => 'reportes-empresas.php',
+            ],
+            [
+                'titulo' => 'Reportes de administradores',
+                'descripcion' => 'Consulta los reportes y actividad de los administradores.',
+                'url' => 'reportes-administradores.php',
             ],
             [
                 'titulo' => 'Gestionar ofertas',

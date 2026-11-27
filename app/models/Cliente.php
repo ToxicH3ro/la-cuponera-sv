@@ -262,5 +262,113 @@ class Cliente
         return true;
     }
 
-}
+    /**
+     * Devuelve la consulta base para obtener los perfiles de clientes
+     * junto con la información de sus cuentas.
+     */
+    private function consultaBasePerfilesAdministracion(): string
+    {
+        return '
+            SELECT
+                c.id AS cliente_id,
+                c.usuario_id,
+                c.nombre,
+                c.apellidos,
+                c.dui,
+                c.fecha_nacimiento,
+                u.usuario,
+                u.correo,
+                u.estado,
+                u.creado_en AS cuenta_creada_en
+            FROM clientes c
+            INNER JOIN usuarios u
+                ON u.id = c.usuario_id
+            WHERE u.rol = :rol
+        ';
+    }
 
+    /**
+     * Lista los perfiles de clientes para la administración.
+     */
+    public function listarPerfilesAdministracion(
+        string $busqueda = ''
+    ): array {
+        $busqueda = trim($busqueda);
+
+        if (strlen($busqueda) > 150) {
+            throw new InvalidArgumentException(
+                'La búsqueda no puede superar los 150 caracteres.'
+            );
+        }
+
+        $sql = $this->consultaBasePerfilesAdministracion();
+
+        $parametros = [
+            'rol' => 'cliente',
+        ];
+
+        if ($busqueda !== '') {
+            $sql .= '
+                AND (
+                    c.nombre LIKE :nombre
+                    OR c.apellidos LIKE :apellidos
+                    OR CONCAT(c.nombre, " ", c.apellidos) LIKE :nombre_completo
+                    OR c.dui LIKE :dui
+                    OR u.usuario LIKE :usuario
+                    OR u.correo LIKE :correo
+                )
+            ';
+
+            $termino = '%' . $busqueda . '%';
+
+            $parametros['nombre'] = $termino;
+            $parametros['apellidos'] = $termino;
+            $parametros['nombre_completo'] = $termino;
+            $parametros['dui'] = $termino;
+            $parametros['usuario'] = $termino;
+            $parametros['correo'] = $termino;
+        }
+
+        $sql .= '
+            ORDER BY c.apellidos ASC, c.nombre ASC, c.id ASC
+        ';
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($parametros);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Busca el perfil completo de un cliente por su ID.
+     * Este método se utiliza desde la administración.
+     */
+    public function buscarPerfilCompletoParaAdministracion(
+        int $clienteId
+    ): ?array {
+        if ($clienteId <= 0) {
+            throw new InvalidArgumentException(
+                'El ID del cliente no es válido.'
+            );
+        }
+
+        $sql = $this->consultaBasePerfilesAdministracion();
+
+        $sql .= '
+            AND c.id = :cliente_id
+            LIMIT 1
+        ';
+
+        $stmt = $this->pdo->prepare($sql);
+
+        $stmt->execute([
+            'rol' => 'cliente',
+            'cliente_id' => $clienteId,
+        ]);
+
+        $perfil = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $perfil !== false ? $perfil : null;
+    }
+
+}
