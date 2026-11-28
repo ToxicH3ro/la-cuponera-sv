@@ -183,3 +183,41 @@ CREATE TABLE tokens_recuperacion (
     INDEX idx_tokens_usuario (usuario_id),
     INDEX idx_tokens_vencimiento (vence_en)
 ) ENGINE=InnoDB;
+
+-- =====================================================
+-- BITÁCORA DE ACCIONES ADMINISTRATIVAS
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS bitacora_administrativa (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    administrador_id BIGINT UNSIGNED NOT NULL,
+    accion VARCHAR(80) NOT NULL,
+    entidad VARCHAR(50) NOT NULL,
+    entidad_id BIGINT UNSIGNED NULL,
+    descripcion VARCHAR(500) NOT NULL,
+    creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_bitacora_administrador
+        FOREIGN KEY (administrador_id)
+        REFERENCES usuarios(id)
+        ON DELETE RESTRICT,
+
+    INDEX idx_bitacora_administrador_fecha (
+        administrador_id,
+        creado_en
+    ),
+
+    INDEX idx_bitacora_accion_fecha (
+        accion,
+        creado_en
+    ),
+
+    INDEX idx_bitacora_entidad (
+        entidad,
+        entidad_id
+    ),
+
+    INDEX idx_bitacora_fecha (
+        creado_en
+    )
+) ENGINE=InnoDB;

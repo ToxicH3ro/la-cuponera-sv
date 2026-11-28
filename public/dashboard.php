@@ -134,6 +134,11 @@ $paneles = [
                 'url' => 'reportes-administradores.php',
             ],
             [
+                'titulo' => 'Bitácora administrativa',
+                'descripcion' => 'Consulta el historial de acciones y eventos administrativos.',
+                'url' => 'bitacora-administrativa.php',
+            ],
+            [
                 'titulo' => 'Gestionar ofertas',
                 'descripcion' => 'Supervisa las promociones de la plataforma.',
                 'url' => '#',

@@ -7,6 +7,7 @@ require_once dirname(__DIR__) . '/models/Empresa.php';
 require_once dirname(__DIR__) . '/models/Usuario.php';
 require_once dirname(__DIR__) . '/models/Cliente.php';
 require_once dirname(__DIR__) . '/models/Reporte.php';
+require_once dirname(__DIR__) . '/models/BitacoraAdministrativa.php';
 
 class AdminController
 {
@@ -14,6 +15,7 @@ class AdminController
     private Usuario $usuarioModel;
     private Cliente $clienteModel;
     private Reporte $reporteModel;
+    private BitacoraAdministrativa $bitacoraModel;
 
     public function __construct(PDO $pdo)
     {
@@ -24,6 +26,7 @@ class AdminController
         $this->usuarioModel = new Usuario($pdo);
         $this->clienteModel = new Cliente($pdo);
         $this->reporteModel = new Reporte($pdo);
+        $this->bitacoraModel = new BitacoraAdministrativa($pdo);
     }
 
     /**
@@ -101,5 +104,51 @@ class AdminController
             $fechaFin,
             $busqueda
         );
+    }
+
+    /**
+     * Obtiene los registros de la bitácora administrativa.
+     */
+    public function listarBitacoraAdministrativa(
+        ?string $accion = null,
+        ?string $fechaInicio = null,
+        ?string $fechaFin = null,
+        string $busqueda = '',
+        int $pagina = 1,
+        int $porPagina = 50
+    ): array {
+        return $this->bitacoraModel->listar(
+            $accion,
+            $fechaInicio,
+            $fechaFin,
+            $busqueda,
+            $pagina,
+            $porPagina
+        );
+    }
+
+    /**
+     * Cuenta los registros de la bitácora según los filtros.
+     */
+    public function contarBitacoraAdministrativa(
+        ?string $accion = null,
+        ?string $fechaInicio = null,
+        ?string $fechaFin = null,
+        string $busqueda = ''
+    ): int {
+        return $this->bitacoraModel->contar(
+            $accion,
+            $fechaInicio,
+            $fechaFin,
+            $busqueda
+        );
+    }
+
+    /**
+     * Obtiene las acciones disponibles para los filtros.
+     */
+    public function listarAccionesBitacoraAdministrativa(): array
+    {
+        return $this->bitacoraModel->listarAcciones();
     }
 }

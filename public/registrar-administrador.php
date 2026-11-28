@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/app/config/database.php';
 require_once dirname(__DIR__) . '/app/helpers/auth.php';
 require_once dirname(__DIR__) . '/app/models/Usuario.php';
+require_once dirname(__DIR__) . '/app/models/BitacoraAdministrativa.php';
 
 /**
  * Página para registrar nuevos administradores.
@@ -94,16 +95,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mensaje = 'Las contraseñas no coinciden.';
         } else {
             try {
-                $usuarioModelo = new Usuario($pdo);
+                $usuarioSesion = obtenerUsuarioAutenticado();
 
-                // El modelo almacena la contraseña con password_hash().
-                $usuarioModelo->crear(
-                    $usuario,
-                    $correo,
-                    $contrasena,
-                    'admin'
-                );
+                $administradorId = (int) ($usuarioSesion['id'] ?? 0);
 
+                if ($administradorId <= 0) {
+                    throw new RuntimeException(
+                        'No se pudo identificar al administrador que realiza el registro.'
+                    );
+                }
+
+                if ($pdo->inTransaction()) {
+                    throw new LogicException(
+                        'El registro de administrador debe iniciar su propia transacción.'
+                    );
+                }
+
+                $pdo->beginTransaction();
+
+                try {
+
+                    $usuarioModelo = new Usuario($pdo);
+
+                    // Registrar la nueva cuenta.
+                    $nuevoAdministradorId = $usuarioModelo->crear(
+                        $usuario,
+                        $correo,
+                        $contrasena,
+                        'admin'
+                    );
+
+                    // Registrar quién creó la cuenta.
+                    $bitacoraModelo = new BitacoraAdministrativa($pdo);
+
+                    $bitacoraModelo->registrar(
+                        $administradorId,
+                        'ADMINISTRADOR_REGISTRADO',
+                        'usuario',
+                        $nuevoAdministradorId,
+                        'Se registró una nueva cuenta de administrador: '
+                        . $usuario
+                        . '.'
+                    );
+
+                    // Confirmar ambas operaciones.
+                    $pdo->commit();
+
+                } catch (Throwable $e) {
+
+                    if ($pdo->inTransaction()) {
+                        $pdo->rollBack();
+                    }
+
+                    throw $e;
+                }
                 // Evita reutilizar el token después de crear la cuenta.
                 $_SESSION['csrf_registro_admin'] = bin2hex(
                     random_bytes(32)
