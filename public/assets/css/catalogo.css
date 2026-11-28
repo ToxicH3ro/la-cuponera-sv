@@ -427,3 +427,80 @@ button:focus-visible {
         padding: 22px;
     }
 }
+
+/* =====================================================
+   IMPRESIÓN DEL COMPROBANTE DE COMPRA
+   ===================================================== */
+
+@media print {
+
+    @page {
+        margin: 15mm;
+    }
+
+    html,
+    body.catalog-body {
+        background: #ffffff !important;
+        color: #111111 !important;
+    }
+
+    /* Ocultar navegación, pie de página y botones. */
+    .site-header,
+    .site-footer,
+    .no-print {
+        display: none !important;
+    }
+
+    /* Aprovechar el espacio disponible de la hoja. */
+    .container {
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .main-content {
+        padding: 0 !important;
+    }
+
+    /* Evitar sombras y elementos decorativos innecesarios. */
+    .offer-detail {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    .detail-main,
+    .detail-summary {
+        width: 100% !important;
+        max-width: none !important;
+        break-inside: avoid;
+        box-shadow: none !important;
+    }
+
+    .detail-summary {
+        margin-top: 20px !important;
+    }
+
+    /* Mantener legible la tabla de cupones. */
+    .company-table-wrapper {
+        overflow: visible !important;
+    }
+
+    .company-table {
+        width: 100% !important;
+        font-size: 10pt;
+    }
+
+    .company-table tr {
+        break-inside: avoid;
+    }
+
+    .notice {
+        color: #333333 !important;
+    }
+
+}

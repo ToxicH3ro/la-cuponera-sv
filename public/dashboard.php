@@ -60,9 +60,9 @@ $paneles = [
                 'url' => 'ofertas.php',
             ],
             [
-                'titulo' => 'Mis compras',
-                'descripcion' => 'Consulta tu historial de compras.',
-                'url' => 'cliente/compras',
+                'titulo' => 'Mis compras y cupones',
+                'descripcion' => 'Consulta tu historial de compras y tus cupones adquiridos.',
+                'url' => 'mis-compras.php',
             ],
             [
                 'titulo' => 'Mi perfil',

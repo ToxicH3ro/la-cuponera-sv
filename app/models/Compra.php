@@ -130,4 +130,33 @@ class Compra
         return (int) $this->pdo->lastInsertId();
     }
 
+    /**
+     * Marca una compra como completada únicamente si está pendiente.
+     */
+    public function marcarComoCompletada(int $compraId): bool
+    {
+        if ($compraId <= 0) {
+            throw new InvalidArgumentException(
+                'El ID de compra no es válido.'
+            );
+        }
+
+        $sql = '
+            UPDATE compras
+            SET estado = :estado_completada
+            WHERE id = :id
+            AND estado = :estado_pendiente
+        ';
+
+        $stmt = $this->pdo->prepare($sql);
+
+        $stmt->execute([
+            'estado_completada' => 'completada',
+            'id' => $compraId,
+            'estado_pendiente' => 'pendiente',
+        ]);
+
+        return $stmt->rowCount() === 1;
+    }
+
 }

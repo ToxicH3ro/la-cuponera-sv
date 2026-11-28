@@ -354,4 +354,101 @@ class Oferta
 
         return $fechaObjeto->format($formato);
     }
+
+    /**
+     * Busca y bloquea una oferta durante una operación de compra.
+     *
+     * Debe ejecutarse dentro de una transacción.
+     */
+    public function bloquearParaCompra(int $id): ?array
+    {
+        if ($id <= 0) {
+            throw new InvalidArgumentException(
+                'El ID de oferta no es válido.'
+            );
+        }
+
+        $sql = '
+            SELECT
+                o.id,
+                o.empresa_id,
+                o.titulo,
+                o.precio_oferta,
+                o.fecha_inicio,
+                o.fecha_fin,
+                o.fecha_limite_canje,
+                o.cantidad_maxima,
+                o.estado,
+
+                e.estado_aprobacion,
+                e.comision_porcentaje,
+
+                CASE
+                    WHEN o.fecha_inicio <= NOW()
+                    AND o.fecha_fin > NOW()
+                    AND o.fecha_limite_canje >= NOW()
+                    THEN 1
+                    ELSE 0
+                END AS vigente
+
+            FROM ofertas o
+
+            INNER JOIN empresas e
+                ON e.id = o.empresa_id
+
+            WHERE o.id = :id
+
+            LIMIT 1
+
+            FOR UPDATE
+        ';
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['id' => $id]);
+
+        $oferta = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $oferta !== false ? $oferta : null;
+    }
+
+    /**
+     * Cuenta los cupones vendidos para una oferta.
+     *
+     * Mantiene el mismo criterio que listarPublicadas():
+     * compra completada y cupón disponible o canjeado.
+     */
+    public function contarCuponesVendidos(int $ofertaId): int
+    {
+        if ($ofertaId <= 0) {
+            throw new InvalidArgumentException(
+                'El ID de oferta no es válido.'
+            );
+        }
+
+        $sql = '
+            SELECT COUNT(*)
+            FROM cupones c
+
+            INNER JOIN compras co
+                ON co.id = c.compra_id
+
+            WHERE c.oferta_id = :oferta_id
+            AND co.estado = :estado_completada
+            AND c.estado IN (
+                :estado_disponible,
+                :estado_canjeado
+            )
+        ';
+
+        $stmt = $this->pdo->prepare($sql);
+
+        $stmt->execute([
+            'oferta_id' => $ofertaId,
+            'estado_completada' => 'completada',
+            'estado_disponible' => 'disponible',
+            'estado_canjeado' => 'canjeado',
+        ]);
+
+        return (int) $stmt->fetchColumn();
+    }
 }

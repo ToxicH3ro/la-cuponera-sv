@@ -9,6 +9,28 @@ require_once dirname(__DIR__) . '/app/controllers/OfertaController.php';
 iniciarSesion();
 
 $usuario = obtenerUsuarioAutenticado();
+// Preparar el formulario de compra para clientes autenticados.
+$tokenCompra = null;
+
+if (
+    $usuario !== null
+    && ($usuario['rol'] ?? null) === 'cliente'
+) {
+    if (
+        !isset($_SESSION['token_compra'])
+        || !is_string($_SESSION['token_compra'])
+    ) {
+        $_SESSION['token_compra'] = bin2hex(random_bytes(32));
+    }
+
+    $tokenCompra = $_SESSION['token_compra'];
+}
+
+// Recuperar mensajes de error de una compra anterior.
+$mensajeErrorCompra = $_SESSION['error_compra'] ?? '';
+
+unset($_SESSION['error_compra']);
+
 $oferta = null;
 $errorConsulta = false;
 
@@ -230,17 +252,94 @@ $tituloPagina = $oferta !== null
                     </div>
                 </dl>
 
-                <p class="notice">
-                    La compra de cupones todavía no está habilitada.
-                </p>
+                <?php if ($mensajeErrorCompra !== ''): ?>
 
-                <?php if ($usuario === null): ?>
+                    <div class="alert alert-error" role="alert">
+                        <?= escaparDetalle($mensajeErrorCompra) ?>
+                    </div>
+
+                <?php endif; ?>
+
+                <?php if (
+                    $usuario !== null
+                    && ($usuario['rol'] ?? null) === 'cliente'
+                ): ?>
+
+                    <form
+                        method="POST"
+                        action="comprar.php"
+                        class="detail-purchase-form"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="token_compra"
+                            value="<?= escaparDetalle($tokenCompra ?? '') ?>"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="oferta_id"
+                            value="<?= (int) $oferta['id'] ?>"
+                        >
+
+                        <div class="form-group">
+
+                            <label for="cantidad">
+                                Cantidad de cupones
+                            </label>
+
+                            <input
+                                type="number"
+                                id="cantidad"
+                                name="cantidad"
+                                value="1"
+                                min="1"
+                                step="1"
+                                required
+                            >
+
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="button button-primary button-block"
+                        >
+                            Confirmar compra
+                        </button>
+
+                    </form>
+
+                    <p class="notice">
+                        Compra de demostración: no se realizará un cobro real.
+                    </p>
+
+                <?php elseif ($usuario === null): ?>
+
+                    <p class="notice">
+                        Inicia sesión con una cuenta de cliente para comprar esta oferta.
+                    </p>
+
                     <a
                         class="button button-primary button-block"
+                        href="login.php"
+                    >
+                        Iniciar sesión
+                    </a>
+
+                    <a
+                        class="button button-secondary button-block"
                         href="register.php"
                     >
                         Crear una cuenta
                     </a>
+
+                <?php else: ?>
+
+                    <p class="notice">
+                        Las compras solamente están disponibles para cuentas de cliente.
+                    </p>
+
                 <?php endif; ?>
 
             </aside>

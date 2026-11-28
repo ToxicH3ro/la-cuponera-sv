@@ -153,4 +153,92 @@ class Cupon
 
         return $stmt->fetchAll();
     }
+
+    /**
+     * Crea un cupón asociado a una compra.
+     *
+     * El código se genera aleatoriamente y la comisión se conserva
+     * como dato histórico de la operación.
+     */
+    public function crear(
+        int $compraId,
+        int $ofertaId,
+        string $precioPagado,
+        float $comisionAplicada
+    ): int {
+        if ($compraId <= 0 || $ofertaId <= 0) {
+            throw new InvalidArgumentException(
+                'Los identificadores de compra y oferta no son válidos.'
+            );
+        }
+
+        $precioPagado = trim($precioPagado);
+
+        if (
+            preg_match(
+                '/\A\d{1,8}(?:\.\d{1,2})?\z/',
+                $precioPagado
+            ) !== 1
+            || (float) $precioPagado <= 0
+        ) {
+            throw new InvalidArgumentException(
+                'El precio pagado no es válido.'
+            );
+        }
+
+        if (
+            !is_finite($comisionAplicada)
+            || $comisionAplicada < 0
+            || $comisionAplicada > 100
+        ) {
+            throw new InvalidArgumentException(
+                'El porcentaje de comisión no es válido.'
+            );
+        }
+
+        $codigo = 'CUP-' . strtoupper(
+            bin2hex(random_bytes(16))
+        );
+
+        $sql = '
+            INSERT INTO cupones (
+                compra_id,
+                oferta_id,
+                codigo_unico,
+                precio_pagado,
+                comision_aplicada,
+                estado
+            ) VALUES (
+                :compra_id,
+                :oferta_id,
+                :codigo_unico,
+                :precio_pagado,
+                :comision_aplicada,
+                :estado
+            )
+        ';
+
+        $stmt = $this->pdo->prepare($sql);
+
+        $stmt->execute([
+            'compra_id' => $compraId,
+            'oferta_id' => $ofertaId,
+            'codigo_unico' => $codigo,
+            'precio_pagado' => number_format(
+                (float) $precioPagado,
+                2,
+                '.',
+                ''
+            ),
+            'comision_aplicada' => number_format(
+                $comisionAplicada,
+                2,
+                '.',
+                ''
+            ),
+            'estado' => 'disponible',
+        ]);
+
+        return (int) $this->pdo->lastInsertId();
+    }
 }
